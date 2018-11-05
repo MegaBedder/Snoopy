@@ -5,7 +5,7 @@
  * Snoopy - the PHP net client
  * Author: Monte Ohrt <monte@ohrt.com>
  * Copyright (c): 1999-2014, all rights reserved
- * Version: 2.0.1
+ * Version: 2.0.2
  * License: GNU Lesser General Public version 2.1
  *
  * You may contact the author of Snoopy by e-mail at:
@@ -29,7 +29,7 @@ class Snoopy
     public $proxy_user = ''; // proxy user to use
     public $proxy_pass = ''; // proxy password to use
 
-    public $agent = 'Snoopy v2.0.1'; // agent we masquerade as
+    public $agent = 'Snoopy v2.0.2'; // agent we masquerade as
     public $referer = ''; // referer info to pass
     public $cookies = []; // array of cookies to pass
     // $cookies['username'] = 'joe';
@@ -53,6 +53,7 @@ class Snoopy
     public $accept = 'image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*';
 
     public $results = ''; // where the content is put
+    public $source = ''; // used for store content before it changed
 
     public $error = ''; // error messages sent here
     public $response_code = ''; // response code returned from server
@@ -285,10 +286,11 @@ class Snoopy
         Function:	fetchlinks
         Purpose:	fetch the links from a web page
         Input:		$URI	where you are fetching from
+                  $img	link only for SRC tag attribute
         Output:		$this->results	an array of the URLs
     \*======================================================================*/
 
-    public function fetchlinks($URI)
+    public function fetchlinks($URI, $img = false)
     {
         if ($this->fetch($URI) === false) {
             return false;
@@ -298,9 +300,9 @@ class Snoopy
             $URI = $this->lastredirectaddr;
         if (is_array($this->results)) {
             for ($x = 0; $x < count($this->results); $x++)
-                $this->results[$x] = $this->_striplinks($this->results[$x]);
+                $this->results[$x] = $this->_striplinks($this->results[$x], $img);
         } else
-            $this->results = $this->_striplinks($this->results);
+            $this->results = $this->_striplinks($this->results, $img);
 
         if ($this->expandlinks)
             $this->results = $this->_expandlinks($this->results, $URI);
@@ -449,29 +451,42 @@ class Snoopy
         Function:	_striplinks
         Purpose:	strip the hyperlinks from an html document
         Input:		$document	document to strip.
+                  $img 		  only SRC attribute check
         Output:		$match		an array of the links
     \*======================================================================*/
 
-    private function _striplinks($document)
+    private function _striplinks($document, $img = false)
     {
-        preg_match_all(
-          "'<\s*a\s.*?href\s*=\s*					# find <a href=
-						([\"\'])?											# find single or double quote
-						(?(1) (.*?)\\1 | ([^\s\>]+))	# if quote found, match up to next matching
-																					# quote, otherwise match up to next space
-						'isx", $document, $links);
-
+        if ($img) {
+            /*
+            * Advanced filter for fetch image link
+            * analyze LINK, IMG, A, DIV tags with attribute SRC, HREF, URL for strip image links.
+            */
+            preg_match_all("/<\s*[link|img|a|div].*\s(src|href|url).*[\"|\'|\(|](.*)[\#|\?|\"|\'|\)]/isxU", $document, $links);
+        }else {
+            preg_match_all(
+              "'<\s*a\s.*?href\s*=\s*	      # find <a href=
+              ([\"\'])?	                    # find single or double quote
+              (?(1) (.*?)\\1 | ([^\s\>]+))	# if quote found, match up to next matching
+                                            # quote, otherwise match up to next space
+              'isx", $document, $links);
+        }
 
         // catenate the non-empty matches from the conditional subpattern
         $match = [];
-        while (list($key, $val) = each($links[2])) {
-            if (!empty($val))
-                $match[] = $val;
-        }
+        if (!empty($links)) {
+            while (list($key, $val) = each($links[2])) {
+                if (!empty($val))
+                    $match[] = $val;
+            }
 
-        while (list($key, $val) = each($links[3])) {
-            if (!empty($val))
-                $match[] = $val;
+            // Control each()
+            if (isset($links[3])) {
+                while (list($key, $val) = each($links[3])) {
+                    if (!empty($val))
+                        $match[] = $val;
+                }
+            }
         }
 
         // return the links
@@ -783,6 +798,20 @@ class Snoopy
         // no framed content
         else
             $this->results = $results;
+
+        /*
+         * store original content of requested page before it changed other class functions.
+         * Now, you can save content after use specific fetch functions
+         * (e.g. fetchlinks(),  fetchtext(), fetchform())
+         */
+        if (is_array($this->results)) {
+          	// save bigest member in $this->source
+            $this->source = $this->results[0];
+            for ($x = 1; $x < count($this->results); $x++)
+                if (strlen($this->results[$x]) > strlen($this->source))
+                $this->source = $this->results[$x];
+        } else
+            $this->source = $this->results;
 
         return $this;
     }
