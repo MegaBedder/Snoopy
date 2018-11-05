@@ -85,12 +85,16 @@ CLASS METHODS:
 	the form elements from the page, stripping out html tags and other
 	irrelevant data.		
 
-	fetchlinks($URI)
+	fetchlinks($URI, [$img = false])
 	----------------
 
 	This behaves exactly like fetch() except that it only returns
 	the links from the page. By default, relative links are
 	converted to their fully qualified URL form.
+
+	Support SRC, HREF and URL tags attribute.
+	$img is boolean attribute for fetch only image link 
+	(true - for enable advanced filter)
 
 	submit($URI,$formvars)
 	----------------------
@@ -131,18 +135,17 @@ CLASS VARIABLES:	(default value in parenthesis)
 	$user			authentication username, if any
 	$pass			authentication password, if any
 	$accept			http accept types (image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*)
+	$source		string source of webpage before $results changed other functions
 	$error			where errors are sent, if any
 	$response_code	responde code returned from server
 	$headers		headers returned from server
 	$maxlength		max return data length
-	$read_timeout	timeout on read operations (requires PHP 4 Beta 4+)
+	$read_timeout	timeout on read operations
 					set to 0 to disallow timeouts
 	$timed_out		true if a read operation timed out (requires PHP 4 Beta 4+)
 	$maxframes		number of frames we will follow
 	$status			http status of fetch
 	$temp_dir		temp directory that the webserver can write to. (/tmp)
-	$curl_path		system path to cURL binary, set to false if none
-					(this variable is ignored as of Snoopy v1.2.6)
 	$cafile			name of a file with CA certificate(s)
 	$capath			name of a correctly hashed directory with CA certificate(s)
 					if either $cafile or $capath is set, SSL certificate
