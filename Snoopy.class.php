@@ -5,20 +5,8 @@
  * Snoopy - the PHP net client
  * Author: Monte Ohrt <monte@ohrt.com>
  * Copyright (c): 1999-2014, all rights reserved
- * Version: 2.0.0
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Version: 2.0.1
+ * License: GNU Lesser General Public version 2.1
  *
  * You may contact the author of Snoopy by e-mail at:
  * monte@ohrt.com
@@ -26,87 +14,82 @@
  * The latest version of Snoopy can be obtained from:
  * http://snoopy.sourceforge.net/
  *************************************************/
+
 class Snoopy
 {
     /**** Public variables ****/
 
     /* user definable vars */
 
-    var $scheme = 'http'; // http or https
-    var $host = "www.php.net"; // host name we are connecting to
-    var $port = 80; // port we are connecting to
-    var $proxy_host = ""; // proxy host to use
-    var $proxy_port = ""; // proxy port to use
-    var $proxy_user = ""; // proxy user to use
-    var $proxy_pass = ""; // proxy password to use
+    public $scheme = 'http'; // http or https
+    public $host = 'www.php.net'; // host name we are connecting to
+    public $port = 80; // port we are connecting to
+    public $proxy_host = ''; // proxy host to use
+    public $proxy_port = ''; // proxy port to use
+    public $proxy_user = ''; // proxy user to use
+    public $proxy_pass = ''; // proxy password to use
 
-    var $agent = "Snoopy v2.0.0"; // agent we masquerade as
-    var $referer = ""; // referer info to pass
-    var $cookies = array(); // array of cookies to pass
-    // $cookies["username"]="joe";
-    var $rawheaders = array(); // array of raw headers to send
-    // $rawheaders["Content-type"]="text/html";
+    public $agent = 'Snoopy v2.0.1'; // agent we masquerade as
+    public $referer = ''; // referer info to pass
+    public $cookies = []; // array of cookies to pass
+    // $cookies['username'] = 'joe';
+    public $rawheaders = []; // array of raw headers to send
+    // $rawheaders['Content-type'] = 'text/html';
 
-    var $maxredirs = 5; // http redirection depth maximum. 0 = disallow
-    var $lastredirectaddr = ""; // contains address of last redirected address
-    var $offsiteok = true; // allows redirection off-site
-    var $maxframes = 0; // frame content depth maximum. 0 = disallow
-    var $expandlinks = true; // expand links to fully qualified URLs.
+    public $maxredirs = 5; // http redirection depth maximum. 0 = disallow
+    public $lastredirectaddr = ''; // contains address of last redirected address
+    public $offsiteok = true; // allows redirection off-site
+    public $maxframes = 0; // frame content depth maximum. 0 = disallow
+    public $expandlinks = true; // expand links to fully qualified URLs.
     // this only applies to fetchlinks()
     // submitlinks(), and submittext()
-    var $passcookies = true; // pass set cookies back through redirects
-    // NOTE: this currently does not respect
-    // dates, domains or paths.
+    public $passcookies = true; // pass set cookies back through redirects
+    // NOTE: this currently does not respect dates, domains or paths.
 
-    var $user = ""; // user for http authentication
-    var $pass = ""; // password for http authentication
+    public $user = ''; // user for http authentication
+    public $pass = ''; // password for http authentication
 
     // http accept types
-    var $accept = "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*";
+    public $accept = 'image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*';
 
-    var $results = ""; // where the content is put
+    public $results = ''; // where the content is put
 
-    var $error = ""; // error messages sent here
-    var $response_code = ""; // response code returned from server
-    var $headers = array(); // headers returned from server sent here
-    var $maxlength = 500000; // max return data length (body)
-    var $read_timeout = 0; // timeout on read operations, in seconds
-    // supported only since PHP 4 Beta 4
+    public $error = ''; // error messages sent here
+    public $response_code = ''; // response code returned from server
+    public $headers = []; // headers returned from server sent here
+    public $maxlength = 500000; // max return data length (body)
+    public $read_timeout = 0; // timeout on read operations, in seconds
     // set to 0 to disallow timeouts
-    var $timed_out = false; // if a read operation timed out
-    var $status = 0; // http request status
+    public $timed_out = false; // if a read operation timed out
+    public $status = 0; // http request status
 
-    var $temp_dir = "/tmp"; // temporary directory that the webserver
+    public $temp_dir = '/tmp'; // temporary directory that the webserver
     // has permission to write to.
     // under Windows, this should be C:\temp
 
-    var $curl_path = false;
-    // deprecated, snoopy no longer uses curl for https requests,
-    // but instead requires the openssl extension.
-
     // send Accept-encoding: gzip?
-    var $use_gzip = true;
+    public $use_gzip = true;
 
     // file or directory with CA certificates to verify remote host with
-    var $cafile;
-    var $capath;
+    public $cafile;
+    public $capath;
 
     /**** Private variables ****/
 
-    var $_maxlinelen = 4096; // max line length (headers)
+    private $_maxlinelen = 4096; // max line length (headers)
 
-    var $_httpmethod = "GET"; // default http request method
-    var $_httpversion = "HTTP/1.0"; // default http request version
-    var $_submit_method = "POST"; // default submit method
-    var $_submit_type = "application/x-www-form-urlencoded"; // default submit type
-    var $_mime_boundary = ""; // MIME boundary for multipart/form-data submit type
-    var $_redirectaddr = false; // will be set if page fetched is a redirect
-    var $_redirectdepth = 0; // increments on an http redirect
-    var $_frameurls = array(); // frame src urls
-    var $_framedepth = 0; // increments on frame depth
+    private $_httpmethod = 'GET'; // default http request method
+    private $_httpversion = 'HTTP/1.0'; // default http request version
+    private $_submit_method = 'POST'; // default submit method
+    private $_submit_type = 'application/x-www-form-urlencoded'; // default submit type
+    private $_mime_boundary = ''; // MIME boundary for multipart/form-data submit type
+    private $_redirectaddr = false; // will be set if page fetched is a redirect
+    private $_redirectdepth = 0; // increments on an http redirect
+    private $_frameurls = []; // frame src urls
+    private $_framedepth = 0; // increments on frame depth
 
-    var $_isproxy = false; // set if using a proxy server
-    var $_fp_timeout = 30; // timeout for socket connection
+    private $_isproxy = false; // set if using a proxy server
+    private $_connection_timeout = 30; // timeout for socket connection
 
     /*======================================================================*\
         Function:	fetch
@@ -117,7 +100,7 @@ class Snoopy
         Output:		$this->results	the output text from the fetch
     \*======================================================================*/
 
-    function fetch($URI)
+    public function fetch($URI)
     {
 
         $URI_PARTS = parse_url($URI);
@@ -142,56 +125,61 @@ class Snoopy
             case "http":
                 $this->scheme = strtolower($URI_PARTS["scheme"]);
                 $this->host = $URI_PARTS["host"];
+
                 if (!empty($URI_PARTS["port"]))
                     $this->port = $URI_PARTS["port"];
-                if ($this->_connect($fp)) {
-                    if ($this->_isproxy) {
-                        // using proxy, send entire URI
-                        $this->_httprequest($URI, $fp, $URI, $this->_httpmethod);
-                    } else {
-                        $path = $URI_PARTS["path"] . ($URI_PARTS["query"] ? "?" . $URI_PARTS["query"] : "");
-                        // no proxy, send only the path
-                        $this->_httprequest($path, $fp, $URI, $this->_httpmethod);
-                    }
 
-                    $this->_disconnect($fp);
-
-                    if ($this->_redirectaddr) {
-                        /* url was redirected, check if we've hit the max depth */
-                        if ($this->maxredirs > $this->_redirectdepth) {
-                            // only follow redirect if it's on this site, or offsiteok is true
-                            if (preg_match("|^https?://" . preg_quote($this->host) . "|i", $this->_redirectaddr) || $this->offsiteok) {
-                                /* follow the redirect */
-                                $this->_redirectdepth++;
-                                $this->lastredirectaddr = $this->_redirectaddr;
-                                $this->fetch($this->_redirectaddr);
-                            }
-                        }
-                    }
-
-                    if ($this->_framedepth < $this->maxframes && count($this->_frameurls) > 0) {
-                        $frameurls = $this->_frameurls;
-                        $this->_frameurls = array();
-
-                        while (list(, $frameurl) = each($frameurls)) {
-                            if ($this->_framedepth < $this->maxframes) {
-                                $this->fetch($frameurl);
-                                $this->_framedepth++;
-                            } else
-                                break;
-                        }
-                    }
-                } else {
+                if (!$this->_connect($fp)) {
                     return false;
                 }
+
+                if ($this->_isproxy) {
+                    // using proxy, send entire URI
+                    $this->_httprequest($URI, $fp, $URI, $this->_httpmethod);
+                } else {
+                    $path = $URI_PARTS["path"] . ($URI_PARTS["query"] ? "?" . $URI_PARTS["query"] : "");
+                    // no proxy, send only the path
+                    $this->_httprequest($path, $fp, $URI, $this->_httpmethod);
+                }
+
+                $this->_disconnect($fp);
+
+                if ($this->_redirectaddr) {
+                    /* url was redirected, check if we've hit the max depth */
+                    if ($this->maxredirs > $this->_redirectdepth) {
+                        // only follow redirect if it's on this site, or offsiteok is true
+                        if (preg_match("|^https?://" . preg_quote($this->host) . "|i", $this->_redirectaddr) || $this->offsiteok) {
+                            /* follow the redirect */
+                            $this->_redirectdepth++;
+                            $this->lastredirectaddr = $this->_redirectaddr;
+                            $this->fetch($this->_redirectaddr);
+                        }
+                    }
+                }
+
+                if ($this->_framedepth < $this->maxframes && count($this->_frameurls) > 0) {
+                    $frameurls = $this->_frameurls;
+                    $this->_frameurls = [];
+
+                    while (list(, $frameurl) = each($frameurls)) {
+                        if ($this->_framedepth < $this->maxframes) {
+                            $this->fetch($frameurl);
+                            $this->_framedepth++;
+                        } else
+                            break;
+                    }
+                }
+
                 return $this;
-                break;
+            break;
+
             default:
                 // not a valid protocol
                 $this->error = 'Invalid protocol "' . $URI_PARTS["scheme"] . '"\n';
                 return false;
-                break;
+            break;
         }
+
         return $this;
     }
 
@@ -206,7 +194,7 @@ class Snoopy
         Output:		$this->results	the text output from the post
     \*======================================================================*/
 
-    function submit($URI, $formvars = "", $formfiles = "")
+    public function submit($URI, $formvars = "", $formfiles = "")
     {
         unset($postdata);
 
@@ -229,60 +217,61 @@ class Snoopy
                     exit;
                 }
                 $this->port = 443;
+
             case "http":
                 $this->scheme = strtolower($URI_PARTS["scheme"]);
                 $this->host = $URI_PARTS["host"];
                 if (!empty($URI_PARTS["port"]))
                     $this->port = $URI_PARTS["port"];
-                if ($this->_connect($fp)) {
-                    if ($this->_isproxy) {
-                        // using proxy, send entire URI
-                        $this->_httprequest($URI, $fp, $URI, $this->_submit_method, $this->_submit_type, $postdata);
-                    } else {
-                        $path = $URI_PARTS["path"] . ($URI_PARTS["query"] ? "?" . $URI_PARTS["query"] : "");
-                        // no proxy, send only the path
-                        $this->_httprequest($path, $fp, $URI, $this->_submit_method, $this->_submit_type, $postdata);
-                    }
-
-                    $this->_disconnect($fp);
-
-                    if ($this->_redirectaddr) {
-                        /* url was redirected, check if we've hit the max depth */
-                        if ($this->maxredirs > $this->_redirectdepth) {
-                            if (!preg_match("|^" . $URI_PARTS["scheme"] . "://|", $this->_redirectaddr))
-                                $this->_redirectaddr = $this->_expandlinks($this->_redirectaddr, $URI_PARTS["scheme"] . "://" . $URI_PARTS["host"]);
-
-                            // only follow redirect if it's on this site, or offsiteok is true
-                            if (preg_match("|^https?://" . preg_quote($this->host) . "|i", $this->_redirectaddr) || $this->offsiteok) {
-                                /* follow the redirect */
-                                $this->_redirectdepth++;
-                                $this->lastredirectaddr = $this->_redirectaddr;
-                                if (strpos($this->_redirectaddr, "?") > 0)
-                                    $this->fetch($this->_redirectaddr); // the redirect has changed the request method from post to get
-                                else
-                                    $this->submit($this->_redirectaddr, $formvars, $formfiles);
-                            }
-                        }
-                    }
-
-                    if ($this->_framedepth < $this->maxframes && count($this->_frameurls) > 0) {
-                        $frameurls = $this->_frameurls;
-                        $this->_frameurls = array();
-
-                        while (list(, $frameurl) = each($frameurls)) {
-                            if ($this->_framedepth < $this->maxframes) {
-                                $this->fetch($frameurl);
-                                $this->_framedepth++;
-                            } else
-                                break;
-                        }
-                    }
-
-                } else {
+                if (!$this->_connect($fp)) {
                     return false;
                 }
+
+                if ($this->_isproxy) {
+                    // using proxy, send entire URI
+                    $this->_httprequest($URI, $fp, $URI, $this->_submit_method, $this->_submit_type, $postdata);
+                } else {
+                    $path = $URI_PARTS["path"] . ($URI_PARTS["query"] ? "?" . $URI_PARTS["query"] : "");
+                    // no proxy, send only the path
+                    $this->_httprequest($path, $fp, $URI, $this->_submit_method, $this->_submit_type, $postdata);
+                }
+
+                $this->_disconnect($fp);
+
+                if ($this->_redirectaddr) {
+                    /* url was redirected, check if we've hit the max depth */
+                    if ($this->maxredirs > $this->_redirectdepth) {
+                        if (!preg_match("|^" . $URI_PARTS["scheme"] . "://|", $this->_redirectaddr))
+                            $this->_redirectaddr = $this->_expandlinks($this->_redirectaddr, $URI_PARTS["scheme"] . "://" . $URI_PARTS["host"]);
+
+                        // only follow redirect if it's on this site, or offsiteok is true
+                        if (preg_match("|^https?://" . preg_quote($this->host) . "|i", $this->_redirectaddr) || $this->offsiteok) {
+                            /* follow the redirect */
+                            $this->_redirectdepth++;
+                            $this->lastredirectaddr = $this->_redirectaddr;
+                            if (strpos($this->_redirectaddr, "?") > 0)
+                                $this->fetch($this->_redirectaddr); // the redirect has changed the request method from post to get
+                            else
+                                $this->submit($this->_redirectaddr, $formvars, $formfiles);
+                        }
+                    }
+                }
+
+                if ($this->_framedepth < $this->maxframes && count($this->_frameurls) > 0) {
+                    $frameurls = $this->_frameurls;
+                    $this->_frameurls = [];
+
+                    while (list(, $frameurl) = each($frameurls)) {
+                        if ($this->_framedepth < $this->maxframes) {
+                            $this->fetch($frameurl);
+                            $this->_framedepth++;
+                        } else
+                            break;
+                    }
+                }
+
                 return $this;
-                break;
+            break;
             default:
                 // not a valid protocol
                 $this->error = 'Invalid protocol "' . $URI_PARTS["scheme"] . '"\n';
@@ -299,22 +288,24 @@ class Snoopy
         Output:		$this->results	an array of the URLs
     \*======================================================================*/
 
-    function fetchlinks($URI)
+    public function fetchlinks($URI)
     {
-        if ($this->fetch($URI) !== false) {
-            if ($this->lastredirectaddr)
-                $URI = $this->lastredirectaddr;
-            if (is_array($this->results)) {
-                for ($x = 0; $x < count($this->results); $x++)
-                    $this->results[$x] = $this->_striplinks($this->results[$x]);
-            } else
-                $this->results = $this->_striplinks($this->results);
-
-            if ($this->expandlinks)
-                $this->results = $this->_expandlinks($this->results, $URI);
-            return $this;
-        } else
+        if ($this->fetch($URI) === false) {
             return false;
+        }
+
+        if ($this->lastredirectaddr)
+            $URI = $this->lastredirectaddr;
+        if (is_array($this->results)) {
+            for ($x = 0; $x < count($this->results); $x++)
+                $this->results[$x] = $this->_striplinks($this->results[$x]);
+        } else
+            $this->results = $this->_striplinks($this->results);
+
+        if ($this->expandlinks)
+            $this->results = $this->_expandlinks($this->results, $URI);
+
+        return $this;
     }
 
     /*======================================================================*\
@@ -324,20 +315,19 @@ class Snoopy
         Output:		$this->results	the resulting html form
     \*======================================================================*/
 
-    function fetchform($URI)
+    public function fetchform($URI)
     {
-
-        if ($this->fetch($URI) !== false) {
-
-            if (is_array($this->results)) {
-                for ($x = 0; $x < count($this->results); $x++)
-                    $this->results[$x] = $this->_stripform($this->results[$x]);
-            } else
-                $this->results = $this->_stripform($this->results);
-
-            return $this;
-        } else
+        if ($this->fetch($URI) === false) {
             return false;
+        }
+
+        if (is_array($this->results)) {
+            for ($x = 0; $x < count($this->results); $x++)
+                $this->results[$x] = $this->_stripform($this->results[$x]);
+        } else
+            $this->results = $this->_stripform($this->results);
+
+        return $this;
     }
 
 
@@ -348,17 +338,19 @@ class Snoopy
         Output:		$this->results	the text from the web page
     \*======================================================================*/
 
-    function fetchtext($URI)
+    public function fetchtext($URI)
     {
-        if ($this->fetch($URI) !== false) {
-            if (is_array($this->results)) {
-                for ($x = 0; $x < count($this->results); $x++)
-                    $this->results[$x] = $this->_striptext($this->results[$x]);
-            } else
-                $this->results = $this->_striptext($this->results);
-            return $this;
-        } else
+        if ($this->fetch($URI) === false) {
             return false;
+        }
+
+        if (is_array($this->results)) {
+            for ($x = 0; $x < count($this->results); $x++)
+                $this->results[$x] = $this->_striptext($this->results[$x]);
+        } else
+            $this->results = $this->_striptext($this->results);
+
+        return $this;
     }
 
     /*======================================================================*\
@@ -368,25 +360,27 @@ class Snoopy
         Output:		$this->results	an array of the links from the post
     \*======================================================================*/
 
-    function submitlinks($URI, $formvars = "", $formfiles = "")
+    public function submitlinks($URI, $formvars = '', $formfiles = '')
     {
-        if ($this->submit($URI, $formvars, $formfiles) !== false) {
-            if ($this->lastredirectaddr)
-                $URI = $this->lastredirectaddr;
-            if (is_array($this->results)) {
-                for ($x = 0; $x < count($this->results); $x++) {
-                    $this->results[$x] = $this->_striplinks($this->results[$x]);
-                    if ($this->expandlinks)
-                        $this->results[$x] = $this->_expandlinks($this->results[$x], $URI);
-                }
-            } else {
-                $this->results = $this->_striplinks($this->results);
-                if ($this->expandlinks)
-                    $this->results = $this->_expandlinks($this->results, $URI);
-            }
-            return $this;
-        } else
+        if ($this->submit($URI, $formvars, $formfiles) === false) {
             return false;
+        }
+
+        if ($this->lastredirectaddr)
+            $URI = $this->lastredirectaddr;
+        if (is_array($this->results)) {
+            for ($x = 0; $x < count($this->results); $x++) {
+                $this->results[$x] = $this->_striplinks($this->results[$x]);
+                if ($this->expandlinks)
+                    $this->results[$x] = $this->_expandlinks($this->results[$x], $URI);
+            }
+        } else {
+            $this->results = $this->_striplinks($this->results);
+            if ($this->expandlinks)
+                $this->results = $this->_expandlinks($this->results, $URI);
+        }
+
+        return $this;
     }
 
     /*======================================================================*\
@@ -396,25 +390,27 @@ class Snoopy
         Output:		$this->results	the text from the web page
     \*======================================================================*/
 
-    function submittext($URI, $formvars = "", $formfiles = "")
+    public function submittext($URI, $formvars = '', $formfiles = '')
     {
-        if ($this->submit($URI, $formvars, $formfiles) !== false) {
-            if ($this->lastredirectaddr)
-                $URI = $this->lastredirectaddr;
-            if (is_array($this->results)) {
-                for ($x = 0; $x < count($this->results); $x++) {
-                    $this->results[$x] = $this->_striptext($this->results[$x]);
-                    if ($this->expandlinks)
-                        $this->results[$x] = $this->_expandlinks($this->results[$x], $URI);
-                }
-            } else {
-                $this->results = $this->_striptext($this->results);
-                if ($this->expandlinks)
-                    $this->results = $this->_expandlinks($this->results, $URI);
-            }
-            return $this;
-        } else
+        if ($this->submit($URI, $formvars, $formfiles) === false) {
             return false;
+        }
+
+        if ($this->lastredirectaddr)
+            $URI = $this->lastredirectaddr;
+        if (is_array($this->results)) {
+            for ($x = 0; $x < count($this->results); $x++) {
+                $this->results[$x] = $this->_striptext($this->results[$x]);
+                if ($this->expandlinks)
+                    $this->results[$x] = $this->_expandlinks($this->results[$x], $URI);
+            }
+        } else {
+            $this->results = $this->_striptext($this->results);
+            if ($this->expandlinks)
+                $this->results = $this->_expandlinks($this->results, $URI);
+        }
+
+        return $this;
     }
 
 
@@ -423,7 +419,7 @@ class Snoopy
         Purpose:	Set the form submission content type to
                     multipart/form-data
     \*======================================================================*/
-    function set_submit_multipart()
+    public function set_submit_multipart()
     {
         $this->_submit_type = "multipart/form-data";
         return $this;
@@ -435,7 +431,7 @@ class Snoopy
         Purpose:	Set the form submission content type to
                     application/x-www-form-urlencoded
     \*======================================================================*/
-    function set_submit_normal()
+    public function set_submit_normal()
     {
         $this->_submit_type = "application/x-www-form-urlencoded";
         return $this;
@@ -456,17 +452,18 @@ class Snoopy
         Output:		$match		an array of the links
     \*======================================================================*/
 
-    function _striplinks($document)
+    private function _striplinks($document)
     {
-        preg_match_all("'<\s*a\s.*?href\s*=\s*			# find <a href=
-						([\"\'])?					# find single or double quote
-						(?(1) (.*?)\\1 | ([^\s\>]+))		# if quote found, match up to next matching
-													# quote, otherwise match up to next space
+        preg_match_all(
+          "'<\s*a\s.*?href\s*=\s*					# find <a href=
+						([\"\'])?											# find single or double quote
+						(?(1) (.*?)\\1 | ([^\s\>]+))	# if quote found, match up to next matching
+																					# quote, otherwise match up to next space
 						'isx", $document, $links);
 
 
         // catenate the non-empty matches from the conditional subpattern
-
+        $match = [];
         while (list($key, $val) = each($links[2])) {
             if (!empty($val))
                 $match[] = $val;
@@ -488,7 +485,7 @@ class Snoopy
         Output:		$match		an array of the links
     \*======================================================================*/
 
-    function _stripform($document)
+    private function _stripform($document)
     {
         preg_match_all("'<\/?(FORM|INPUT|SELECT|TEXTAREA|(OPTION))[^<>]*>(?(2)(.*(?=<\/?(option|select)[^<>]*>[\r\n]*)|(?=[\r\n]*))|(?=[\r\n]*))'Usi", $document, $elements);
 
@@ -507,12 +504,12 @@ class Snoopy
         Output:		$text		the resulting text
     \*======================================================================*/
 
-    function _striptext($document)
+    private function _striptext($document)
     {
 
         // I didn't use preg eval (//e) since that is only available in PHP 4.0.
-        // so, list your entities one by one here. I included some of the
-        // more common ones.
+        // so, list your entities one by one here.
+        // I included some of the more common ones.
 
         $search = array("'<script[^>]*?>.*?</script>'si", // strip out javascript
             "'<[\/\!]*?[^<>]*?>'si", // strip out html tags
@@ -576,7 +573,7 @@ class Snoopy
         Output:		$expandedLinks	the expanded links
     \*======================================================================*/
 
-    function _expandlinks($links, $URI)
+    private function _expandlinks($links, $URI)
     {
 
         preg_match("/^[^\?]+/", $URI, $match);
@@ -616,7 +613,7 @@ class Snoopy
         Output:
     \*======================================================================*/
 
-    function _httprequest($url, $fp, $URI, $http_method, $content_type = "", $body = "")
+    private function _httprequest($url, $fp, $URI, $http_method, $content_type = "", $body = "")
     {
         $cookie_headers = '';
         if ($this->passcookies && $this->_redirectaddr)
@@ -636,6 +633,7 @@ class Snoopy
             $headers .= "User-Agent: " . $this->agent . "\r\n";
         if (!empty($this->accept))
             $headers .= "Accept: " . $this->accept . "\r\n";
+
         if ($this->use_gzip) {
             // make sure PHP was built with --with-zlib
             // and we can handle gzipp'ed data
@@ -648,8 +646,10 @@ class Snoopy
                     E_USER_NOTICE);
             }
         }
+
         if (!empty($this->referer))
             $headers .= "Referer: " . $this->referer . "\r\n";
+
         if (!empty($this->cookies)) {
             if (!is_array($this->cookies))
                 $this->cookies = (array)$this->cookies;
@@ -658,25 +658,30 @@ class Snoopy
             if (count($this->cookies) > 0) {
                 $cookie_headers .= 'Cookie: ';
                 foreach ($this->cookies as $cookieKey => $cookieVal) {
-                    $cookie_headers .= $cookieKey . "=" . urlencode($cookieVal) . "; ";
+                    $cookie_headers .= $cookieKey . "=" . $cookieVal . "; ";
+                    // $cookie_headers .= $cookieKey . "=" . urlencode($cookieVal) . "; ";
                 }
                 $headers .= substr($cookie_headers, 0, -2) . "\r\n";
             }
         }
+
         if (!empty($this->rawheaders)) {
             if (!is_array($this->rawheaders))
                 $this->rawheaders = (array)$this->rawheaders;
             while (list($headerKey, $headerVal) = each($this->rawheaders))
                 $headers .= $headerKey . ": " . $headerVal . "\r\n";
         }
+
         if (!empty($content_type)) {
             $headers .= "Content-type: $content_type";
             if ($content_type == "multipart/form-data")
                 $headers .= "; boundary=" . $this->_mime_boundary;
             $headers .= "\r\n";
         }
+
         if (!empty($body))
             $headers .= "Content-length: " . strlen($body) . "\r\n";
+
         if (!empty($this->user) || !empty($this->pass))
             $headers .= "Authorization: Basic " . base64_encode($this->user . ":" . $this->pass) . "\r\n";
 
@@ -787,7 +792,7 @@ class Snoopy
         Purpose:	set cookies for a redirection
     \*======================================================================*/
 
-    function setcookies()
+    private function setcookies()
     {
         for ($x = 0; $x < count($this->headers); $x++) {
             if (preg_match('/^set-cookie:[\s]+([^=]+)=([^;]+)/i', $this->headers[$x], $match))
@@ -803,7 +808,7 @@ class Snoopy
         Input:		$fp	file pointer
     \*======================================================================*/
 
-    function _check_timeout($fp)
+    private function _check_timeout($fp)
     {
         if ($this->read_timeout > 0) {
             $fp_status = socket_get_status($fp);
@@ -821,7 +826,7 @@ class Snoopy
         Input:		$fp	file pointer
     \*======================================================================*/
 
-    function _connect(&$fp)
+    private function _connect(&$fp)
     {
         if (!empty($this->proxy_host) && !empty($this->proxy_port)) {
             $this->_isproxy = true;
@@ -840,7 +845,7 @@ class Snoopy
 
         $this->status = 0;
 
-        $context_opts = array();
+        $context_opts = [];
 
         if ($this->scheme == 'https') {
             // if cafile or capath is specified, enable certificate
@@ -857,50 +862,40 @@ class Snoopy
                 if (isset($this->capath))
                     $context_opts['ssl']['capath'] = $this->capath;
             }
-                    
+
             $host = 'ssl://' . $host;
         }
 
         $context = stream_context_create($context_opts);
 
-        if (version_compare(PHP_VERSION, '5.0.0', '>')) {
-            if($this->scheme == 'http')
-                $host = "tcp://" . $host;
-            $fp = stream_socket_client(
-                "$host:$port",
-                $errno,
-                $errmsg,
-                $this->_fp_timeout,
-                STREAM_CLIENT_CONNECT,
-                $context);
-        } else {
-            $fp = fsockopen(
-                $host,
-                $port,
-                $errno,
-                $errstr,
-                $this->_fp_timeout,
-                $context);
-        }
+        if($this->scheme == 'http')
+            $host = "tcp://" . $host;
 
-        if ($fp) {
-            // socket connection succeeded
-            return true;
-        } else {
+        $fp = stream_socket_client(
+            "$host:$port",
+            $errno,
+            $errmsg,
+            $this->_connection_timeout,
+            STREAM_CLIENT_CONNECT,
+            $context);
+
+        if (!$fp) {
             // socket connection failed
-            $this->status = $errno;
+
             switch ($errno) {
-                case -3:
-                    $this->error = "socket creation failed (-3)";
-                case -4:
-                    $this->error = "dns lookup failure (-4)";
-                case -5:
-                    $this->error = "connection refused or timed out (-5)";
-                default:
-                    $this->error = "connection failed (" . $errno . ")";
+                case -3: $this->error = 'socket creation failed'; break;
+                case -4: $this->error = 'dns lookup failure'; break;
+                case -5: $this->error = 'connection refused or timed out'; break;
+                default: $this->error = 'connection failed (' . $errno . ')';
             }
+
+            $this->status = $errno;
+
             return false;
         }
+
+        // socket connection succeeded
+        return true;
     }
 
     /*======================================================================*\
@@ -909,7 +904,7 @@ class Snoopy
         Input:		$fp	file pointer
     \*======================================================================*/
 
-    function _disconnect($fp)
+    private function _disconnect($fp)
     {
         return (fclose($fp));
     }
@@ -923,7 +918,7 @@ class Snoopy
         Output:		post body
     \*======================================================================*/
 
-    function _prepare_post_body($formvars, $formfiles)
+    private function _prepare_post_body($formvars, $formfiles)
     {
         settype($formvars, "array");
         settype($formfiles, "array");
@@ -943,7 +938,7 @@ class Snoopy
                     } else
                         $postdata .= urlencode($key) . "=" . urlencode($val) . "&";
                 }
-                break;
+            break;
 
             case "multipart/form-data":
                 $this->_mime_boundary = "Snoopy" . md5(uniqid(microtime()));
@@ -980,7 +975,7 @@ class Snoopy
                     }
                 }
                 $postdata .= "--" . $this->_mime_boundary . "--\r\n";
-                break;
+            break;
         }
 
         return $postdata;
@@ -992,10 +987,8 @@ class Snoopy
     Output:		string results
     \*======================================================================*/
 
-    function getResults()
+    public function getResults()
     {
         return $this->results;
     }
 }
-
-?>
